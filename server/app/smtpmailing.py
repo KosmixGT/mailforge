@@ -5,7 +5,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-router = APIRouter(tags=['sending_email'])
+router = APIRouter(tags=['send_mailing'])
 
 # Модель данных для получения информации о письме от клиента
 class EmailData(BaseModel):
@@ -38,4 +38,4 @@ async def send_email(email_data: EmailData):
         server.sendmail(email_data.smtp_username, email_data.recipient_emails, message.as_string())
     
     # Возвращаем ответ клиенту
-    return {"message": "Email sent successfully"}
+    return {"message": "E-mail рассылка успешно отправлена"}

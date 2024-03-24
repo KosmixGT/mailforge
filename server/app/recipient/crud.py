@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Recipient
+from models import Recipient, Address
 from recipient.schemas import RecipientBase, RecipientCreate
 from models import User
 from auth import get_current_user
@@ -20,4 +20,8 @@ def create_recipient(db: Session, recipient: RecipientCreate):
 
 def get_recipients_by_mailing_id(db: Session, mailing_id: int):
     return db.query(Recipient).filter(Recipient.mailingid == mailing_id).all()
+
+#Загрузка получателей из API по идентификатору записи истории
+def get_recipients_by_history_id(db: Session, history_id: int):
+    return db.query(Recipient).filter(Recipient.historyid == history_id).all()
 

@@ -25,7 +25,7 @@ def get_mailings_by_user_id(user_id: int, db: Session = Depends(get_db)):
     return crud.get_mailings_by_user_id(db, user_id)
 
 @router.get("/", response_model=List[MailingBase])  
-def get_mailings(db: Session = Depends(get_db)):
+def get_mailings(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return crud.get_mailings(db)
 
 @router.post("/create", response_model=MailingCreate)

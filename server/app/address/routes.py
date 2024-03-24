@@ -32,3 +32,8 @@ def create_address(address: AddressCreate, db: Session = Depends(get_db)):
 @router.get("/by_type/{address_type}", response_model=List[AddressBase])
 def get_addresses_by_type(address_type: str, db: Session = Depends(get_db)):
     return crud.get_addresses_by_type(db, address_type)
+
+#get по address
+@router.get("/by_address/{address_value}", response_model=List[AddressBase])
+def get_addresses_by_address(address_value: str, db: Session = Depends(get_db)):
+    return crud.get_addresses_by_address(db, address_value)

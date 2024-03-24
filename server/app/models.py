@@ -98,7 +98,9 @@ class Recipient(Base):
     mailingid = Column(ForeignKey('mailings.mailingid', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     addressid = Column(ForeignKey('addresses.addressid', ondelete='RESTRICT', onupdate='CASCADE'), nullable=False)
     deliverystatusid = Column(ForeignKey('deliverystatuses.deliverystatusid', ondelete='SET NULL', onupdate='CASCADE'))
+    historyid = Column(ForeignKey('mailinghistory.historyid', ondelete='RESTRICT', onupdate='CASCADE'), nullable=False)
 
     address = relationship('Address')
     deliverystatus = relationship('Deliverystatus')
+    mailinghistory = relationship('Mailinghistory')
     mailing = relationship('Mailing')

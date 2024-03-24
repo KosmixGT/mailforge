@@ -21,14 +21,14 @@
             <v-row>
               <v-col cols="12" class="mt-3">
                 <v-btn class="lighten-4 mr-2" color="green" @click="saveMailing">Сохранить</v-btn>
-                <v-btn v-if="$route.params.mailingId !== '-1'" color="error" @click="deleteMailing">Удалить</v-btn>
+                <v-btn v-if="!isCreatingMailing" color="error" @click="deleteMailing">Удалить</v-btn>
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
 
         <!-- Настройки отправки -->
-        <v-card class="pref">
+        <v-card v-if="!isCreatingMailing" class="pref">
           <v-card-title>
             <span class="headline">Настройки отправки</span>
           </v-card-title>
@@ -37,13 +37,21 @@
               @change="handleDeliveryMethodChange"></v-select>
 
             <!-- Поля для параметров рассылки для SMTP -->
-            <div v-if="deliveryMethod === 'Email'">
-              <v-text-field v-model="smtpHost" label="Хост SMTP" autocomplete="on"></v-text-field>
-              <v-text-field v-model="smtpPort" label="Порт SMTP" autocomplete="on"></v-text-field>
-              <v-text-field v-model="smtpUsername" label="Имя пользователя SMTP" autocomplete="on"></v-text-field>
+            <v-form v-if="deliveryMethod === 'Email'">
+              <v-row>
+                <v-col cols="7" class="d-flex align-center">
+                  <v-text-field v-model="smtpHost" label="Хост SMTP" :rules="hostInputRules" required></v-text-field>
+                </v-col>
+                <v-col cols="5" class="d-flex align-center">
+                  <v-text-field v-model="smtpPort" label="Порт SMTP" :rules="portInputRules" required></v-text-field>
+                </v-col>
+              </v-row>
+
+
+              <v-text-field v-model="smtpUsername" label="Имя пользователя SMTP" required></v-text-field>
               <v-row>
                 <v-text-field class="ml-3" v-model="smtpPassword" label="Пароль SMTP" :type="passwordType"
-                  required autocomplete="on"></v-text-field>
+                  required></v-text-field>
                 <v-col cols="2" class="d-flex align-center">
                   <v-btn icon @click="togglePasswordVisibility"
                     :class="{ 'show-password': passwordType === 'password' }">
@@ -53,22 +61,23 @@
                   </v-btn>
                 </v-col>
               </v-row>
-            </div>
+              <v-btn color="primary" @click="sendMailing">Отправить рассылку</v-btn>
+            </v-form>
 
             <!-- Поля для параметров рассылки для Telegram -->
             <div v-else-if="deliveryMethod === 'Telegram'">
-              <v-text-field v-model="telegramToken" label="Токен Telegram"></v-text-field>
-              <v-text-field v-model="telegramChatId" label="ID чата Telegram"></v-text-field>
+              <v-text-field v-model="telegramToken" label="Токен Telegram" :rules="tgBotTokenInputRules"></v-text-field>
+              <v-btn color="primary" @click="sendTelegramMailing">Отправить рассылку в ТГ</v-btn>
             </div>
 
-            <v-btn color="primary" @click="sendMailing">Отправить рассылку</v-btn>
+
           </v-card-text>
         </v-card>
       </v-col>
 
 
       <!-- Показываем получателей в отдельной карточке справа -->
-      <v-col cols="5">
+      <v-col v-if="!isCreatingMailing" cols="5">
         <!-- Верхняя часть для отображения существующих адресов -->
         <v-card class="mb-4">
           <v-card-title>Существующие адреса</v-card-title>
@@ -110,6 +119,7 @@
             <v-btn @click="addNewAddress" :disabled="!isAddressValid">Добавить</v-btn>
           </v-card-text>
         </v-card>
+        <!-- Конечный набор адресов -->
         <v-card class="mt-4">
           <v-card-title>Конечный набор</v-card-title>
           <v-card-text>
@@ -188,6 +198,18 @@
     </v-card>
   </v-dialog>
 
+  <!-- Окно об успешном создании рассылки -->
+  <v-dialog v-model="successDialog" max-width="500" persistent>
+    <v-card>
+      <v-card-title class="headline">{{ successMessage }}</v-card-title>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="green" @click="closeSuccessDialog">OK</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
 </template>
 
 <script>
@@ -202,6 +224,8 @@ export default {
     return {
       errorDialog: false,
       errorMessage: '',
+      successDialog: false,
+      successMessage: '',
       deleteDialog: false, // добавляем переменную для управления модальным окном подтверждения удаления
       // Использование хранилища рассылок
       mailingsStore: useMailingStore(),
@@ -220,7 +244,7 @@ export default {
       selectedAddresses: [], // Выбранные адреса галочкой в списке адресов
       newAddresses: [],
       newAddress: '',
-      markedAddresses: [],
+      markedAddresses: [], // помеченные адреса в конечном списке
       shownAddresses: [],
       // Параметры рассылки для SMTP
       smtpHost: '',
@@ -229,16 +253,18 @@ export default {
       smtpPassword: '',
       // Параметры рассылки для Telegram
       telegramToken: '',
-      telegramChatId: '',
       passwordType: '',
-      allSelected: false
+      allSelected: false, // Флаг выбора всех адресов
+      // флаг создания рассылки, если индекс, который передался равен -1
+      isCreatingMailing: true
     };
   },
   // Жизненный цикл: создание компонента
   async created() {
     const mailingId = this.$route.params.mailingId;
+    this.isCreatingMailing = this.$route.params.mailingId === '-1' ? true : false;
     // Если индекс -1, это означает, что мы создаем новую рассылку
-    if (mailingId === '-1') {
+    if (this.isCreatingMailing) {
       // Создаем новую рассылку с пустыми значениями
       this.selectedMailing = {
         title: '',
@@ -286,6 +312,28 @@ export default {
         value => this.isTelegramDelivery ? (value.startsWith('@') && value.length > 1) || 'Адрес Telegram должен начинаться с "@" и не быть пустым' : /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) || 'Введите корректный Email адрес'
       ];
     },
+    portInputRules() {
+      return [
+        value => !!value || 'Поле обязательно для заполнения',
+        value => /^\d+$/.test(value) || 'Порт должен быть числом',
+        value => value.length < 6 && value.length > 0 || 'Порт должен быть меньше 6-ти знаков'
+      ];
+    },
+    hostInputRules() {
+      return [
+        value => !!value || 'Поле обязательно для заполнения',
+        value => /^[^\s]+$/.test(value) || 'Адрес не должен содержать пробелов',
+        value => value.length < 255 && value.length > 0 || 'Адрес должен быть меньше 255-ти знаков',
+        value => value.startsWith('smtp.') || 'Адрес должен начинаться с "smtp."'
+      ];
+    },
+    tgBotTokenInputRules() {
+      return [
+        value => !!value || 'Поле обязательно для заполнения',
+        value => /^[^\s]+$/.test(value) || 'Токен не должен содержать пробелов',
+        value => /^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$/.test(value) || 'Неверный формат токена',
+      ];
+    }
   },
   // Методы компонента
   methods: {
@@ -314,10 +362,28 @@ export default {
       this.filterAdressesByDeliveryMethod();
     },
     filterAddresses() {
-      // В этом методе вы можете фильтровать адреса на основе введенного поискового запроса
-      // Например, можно использовать метод filter
-      this.shownAddresses = this.filteredAddresses.filter(address => address.address.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      // Filter addresses based on the search query
+      const filtered = this.filteredAddresses.filter(address =>
+        address.address.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+
+      // Synchronize selectedAddresses with filteredAddresses
+      const selectedAddressesMap = new Map(this.filteredAddresses.map((address, index) => [address, this.selectedAddresses[index] || false]));
+      this.selectedAddresses = filtered.map(address => selectedAddressesMap.get(address));
+
+      // Update shownAddresses with the filtered list
+      this.shownAddresses = filtered;
+
+      // Automatically mark checkboxes for addresses from markedAddresses that are in the filtered list
+      this.markedAddresses.forEach(address => {
+        const index = this.shownAddresses.findIndex(item => item === address);
+        if (index !== -1) {
+          this.selectedAddresses[index] = true;
+        }
+      });
+      console.log(this.selectedAddresses)
     },
+
     showError(message) {
       this.errorMessage = message;
       this.errorDialog = true;
@@ -329,6 +395,17 @@ export default {
         this.$router.push('/not-found');
       }
     },
+    openSuccessDialog(message) {
+      this.successMessage = message;
+      this.successDialog = true;
+    },
+    closeSuccessDialog() {
+      this.successDialog = false;
+      this.$router.push('/mailings');
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    },
     // Загрузка данных выбранной рассылки
     async loadMailing(mailingIndex) {
       try {
@@ -338,12 +415,11 @@ export default {
           // Если рассылка найдена, сохраняем её в selectedMailing
           this.selectedMailing = mailing;
         } else {
-          console.error('Mailing not found');
           // Если рассылка не найдена, переадресовываем на страницу "Not Found"
           this.showError('Рассылка не найдена');
         }
       } catch (error) {
-        console.error('Error fetching mailing:', error);
+        console.error('Ошибка загрузки рассылки:', error);
       }
     },
     // Логика сохранения рассылки
@@ -366,7 +442,7 @@ export default {
       }
       try {
         // Если у рассылки есть id, значит она уже существует и нужно обновить её
-        if (this.$route.params.mailingId != '-1') {
+        if (!this.isCreatingMailing) {
           // Логика обновления рассылки
           this.mailingsStore.updateMailing(mailing_Id, authStore.user.user_data.id, this.selectedMailing);
         }
@@ -374,11 +450,13 @@ export default {
           // Если у рассылки нет id, значит это новая рассылка и нужно добавить её
           // Логика добавления новой рассылки
           this.mailingsStore.createMailing(this.selectedMailing, authStore.user.user_data.id);
+
         }
-        this.$router.push('/mailings'); // Переход на страницу списка рассылок после сохранения
+        this.openSuccessDialog("Рассылка успешно сохранена");
+        //this.$router.push('/mailings'); // Переход на страницу списка рассылок после сохранения
       }
       catch (error) {
-        console.error('Error saving mailing:', error);
+        // console.error('Ошибка сохранения рассылки:', error);
         this.showError('Произошла ошибка при сохранении рассылки');
       }
     },
@@ -408,11 +486,37 @@ export default {
     // Логика отправки рассылки
     sendMailing() {
       // Логика отправки рассылки
-      // const adressesForMailing = this.markedAddresses.concat(this.newAddresses);
-
       //в markedAddresses хранятся объекты (id, type_id, address), в newAddresses только address
       //берём только адреса получателей      
       const recipient_emails = this.markedAddresses.map(item => item.address).concat(this.newAddresses);
+      if (this.selectedMailing.title.trim() === '') {
+        this.showError('Введите заголовок рассылки');
+        return;
+      }
+      if (this.selectedMailing.messagetext.trim() === '') {
+        this.showError('Введите текст сообщения');
+        return;
+      }
+      if (recipient_emails.length === 0) {
+        this.showError('Выберите хотя бы одного получателя');
+        return;
+      }
+      if (this.smtpHost === '') {
+        this.showError('Введите хост SMTP-сервера');
+        return;
+      }
+      if (this.smtpPort === '') {
+        this.showError('Введите порт SMTP-сервера');
+        return;
+      }
+      if (this.smtpUsername === '') {
+        this.showError('Введите имя пользователя SMTP');
+        return;
+      }
+      if (this.smtpPassword === '') {
+        this.showError('Введите пароль SMTP');
+        return;
+      }
 
       const formData = {
         recipient_emails: recipient_emails, // список адресов получателей
@@ -428,11 +532,14 @@ export default {
       axios.post('/send_email', formData)
         .then(response => {
           console.log(response.data); // Выводим ответ от сервера в консоль
-          // Добавьте здесь код для обработки успешного ответа от сервера
+          //отправляем POST-запрос на бэкенд на добавление новых адресов в базу данных
+          this.addInHistory(true, true)
+          this.openSuccessDialog("Рассылка через E-mail успешно отправлена");
         })
         .catch(error => {
-          console.error('Error sending email:', error); // Обработка ошибки при отправке запроса
-          // Добавьте здесь код для обработки ошибки при отправке запроса
+          this.addInHistory(false, true)
+          this.showError(`Ошибка отправления рассылки: ${error.message}`);
+          // console.error('Error sending email:', error); // Обработка ошибки при отправке запроса
           if (error.isAxiosError) {
             // Данные запроса можно найти в свойстве config
             if (error.config && error.config.data) {
@@ -445,6 +552,133 @@ export default {
             console.error("Ошибка не является объектом AxiosError");
           }
 
+        });
+    },
+    sendTelegramMailing() {
+      const recipient_emails = this.markedAddresses.map(item => item.address).concat(this.newAddresses);
+      if (this.selectedMailing.title.trim() === '') {
+        this.showError('Введите заголовок рассылки');
+        return;
+      }
+      if (this.selectedMailing.messagetext.trim() === '') {
+        this.showError('Введите текст сообщения');
+        return;
+      }
+      if (recipient_emails.length === 0) {
+        this.showError('Выберите хотя бы одного получателя');
+        return;
+      }
+      if (this.telegramToken === '') {
+        this.showError('Введите токен телеграмм бота');
+        return;
+      }
+      const formData = {
+        chat_ids: recipient_emails, // список адресов получателей
+        subject: this.selectedMailing.title, // тема письма
+        body: this.selectedMailing.messagetext, // текст сообщения
+        bot_token: this.telegramToken // токен телеграмм бота
+      };
+
+      // Отправляем POST-запрос на бэкенд
+      axios.post('/send_telegram', formData)
+        .then(response => {
+          console.log(response.data); // Выводим ответ от сервера в консоль
+          this.addInHistory(true, false)
+          this.openSuccessDialog("Рассылка через Telegram успешно отправлена");
+        })
+        .catch(error => {
+          this.addInHistory(false, false)
+          this.showError(`Ошибка отправления рассылки: ${error.message}`);
+          // console.error('Error sending email:', error); // Обработка ошибки при отправке запроса
+          if (error.isAxiosError) {
+            // Данные запроса можно найти в свойстве config
+            if (error.config && error.config.data) {
+              const requestData = JSON.parse(error.config.data);
+              console.log("Данные запроса:", requestData);
+            } else {
+              console.log("Данные запроса отсутствуют");
+            }
+          } else {
+            console.error("Ошибка не является объектом AxiosError");
+          }
+
+        });
+
+    },
+    addInHistory(isSendingSuccess, isEmailSending) {
+      //текущие дата и времени по текущему часовому поясу
+      const currentDate = new Date();
+      currentDate.setHours(currentDate.getHours());
+      let historyId;
+      axios.post('/history/create', {
+        mailingid: this.selectedMailing.mailingid,
+        senttime: currentDate,
+        deliverystatusid: isSendingSuccess ? 1 : 2
+      })
+        .then(response => {
+          historyId = response.data[1];
+          console.log("Рассылка добавлена в историю успешно:", response.data); // Выводим ответ от сервера в консоль
+          //Добавляем новые адреса в БД
+          let newAddressesObjectsFromDB = []
+          if (this.newAddresses.length !== 0) {
+            const formNewAddresses = this.newAddresses.map(item => {
+              return {
+                address: item,
+                typeid: isEmailSending ? 1 : 2,
+              }
+            })
+            for (const addressData of formNewAddresses) {
+              try {
+                axios.post('/addresses/create', addressData);
+                console.log('New Address added successfully:', addressData);
+              } catch (error) {
+                console.error('Failed to add new address:', addressData, error);
+              }
+            }
+            //получаем из БД объекты созданных адресов по параметру адрес из formNewAddresses     
+            for (const addressData of formNewAddresses) {
+              try {
+                newAddressesObjectsFromDB.push(axios.get(`/addresses/by_address/${addressData.address}`));
+                // console.log('New Address added successfully:', addressData);
+              } catch (error) {
+                // console.error('Failed to add new address:', addressData, error);
+              }
+            }
+          }
+
+          //Добавляем получателей в БД
+          const listOfRecipients = newAddressesObjectsFromDB.concat(this.markedAddresses);
+          console.log("Список получателей:", listOfRecipients)
+          const formAllRecipients = listOfRecipients.map(item => {
+            return {
+              mailingid: this.selectedMailing.mailingid,
+              addressid: item.addressid,
+              deliverystatusid: isSendingSuccess ? 1 : 2,
+              historyid: historyId
+            }
+          })
+
+          for (const recipient of formAllRecipients) {
+            try {
+              axios.post('/recipients/create', recipient)
+                .then(response => {
+                  console.log("Получатель создан:", response.data); // Выводим ответ от сервера в консоль
+                  // Добавьте здесь код для обработки успешного ответа от сервера
+                })
+                .catch(error => {
+                  console.error('Ошибка добавления получателя в бд:', error, recipient); // Обработка ошибки при отправке запроса
+                  // Добавьте здесь код для обработки ошибки при отправке запроса
+                });
+              console.log('Recipients added successfully:', recipient);
+            } catch (error) {
+              console.error('Failed to add recipients:', recipient, error);
+            }
+          }
+          // Добавьте здесь код для обработки успешного ответа от сервера
+        })
+        .catch(error => {
+          console.error('Ошибка добавления рассылки в историю:', error); // Обработка ошибки при отправке запроса
+          // Добавьте здесь код для обработки ошибки при отправке запроса
         });
     },
     // Метод для добавления нового адреса
@@ -468,34 +702,37 @@ export default {
     },
     updateSelectedAddresses(index) {
       if (this.selectedAddresses[index]) {
-        // если адрес отмечен, добавить его в массив
-        // например, используем метод push
-        this.markedAddresses.push(this.shownAddresses[index]);
-        if(this.selectedAddresses.length === this.shownAddresses.length) {
+        // If the address is selected, add it to the markedAddresses array
+        if (!this.markedAddresses.includes(this.shownAddresses[index])) {
+          this.markedAddresses.push(this.shownAddresses[index]);
+        }
+        if (this.selectedAddresses.length === this.shownAddresses.length) {
           this.allSelected = true;
         }
       } else {
-        // если адрес снят, удалить его из массива
-        // например, используем метод splice
-        const selectedIndex = this.markedAddresses.indexOf(this.shownAddresses[index]);
+        // If the address is deselected, remove it from the markedAddresses array
+        const originalIndex = this.filteredAddresses.findIndex(address => address === this.shownAddresses[index]);
+        const selectedIndex = this.markedAddresses.findIndex((address, idx) => idx === originalIndex);
         if (selectedIndex !== -1) {
           this.markedAddresses.splice(selectedIndex, 1);
         }
+        this.allSelected = false; // Ensure allSelected is false if any address is deselected
       }
+      console.log(this.selectedAddresses)
     },
+
+
+
     selectAllAddresses() {
       this.allSelected = !this.allSelected;
-      // Проверяем, все ли чекбоксы уже установлены в true
-      const allSelected = this.selectedAddresses.every(selected => selected);
-
-      if (allSelected && this.selectedAddresses.length > 0) {
-        // Если все чекбоксы уже установлены в true, снимаем все галочки
-        this.selectedAddresses = this.shownAddresses.map(() => false);
-        this.markedAddresses = [];
-      } else {
-        // Если хотя бы один чекбокс не установлен в true, выбираем все адреса и добавляем их в массив отмеченных адресов
+      if (this.allSelected) {
+        // If "Select All" is clicked
         this.selectedAddresses = this.shownAddresses.map(() => true);
         this.markedAddresses = [...this.shownAddresses];
+      } else {
+        // If "Deselect All" is clicked
+        this.selectedAddresses = this.shownAddresses.map(() => false);
+        this.markedAddresses = [];
       }
     },
     togglePasswordVisibility() {

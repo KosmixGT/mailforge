@@ -14,6 +14,9 @@ def get_addresses(db: Session, skip: int = 0, limit: int = 100):
 def get_addresses_by_type(db: Session, typeid: int):
     return db.query(Address).filter(Address.typeid == typeid).all()
 
+def get_addresses_by_address(db: Session, address: str):
+    return db.query(Address).filter(Address.address == address).all()
+
 def create_address(db: Session, address: AddressCreate):
     db_address = Address(**address.dict())
     db.add(db_address)

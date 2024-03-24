@@ -59,7 +59,7 @@ export default {
         // console.log("Полная загрузка рассылок с запросом к БД")
       }
     } catch (error) {
-      console.error('Error fetching mailings:', error);
+      console.error('Ошибка загрузки рассылок:', error);
     } finally {
       this.loading = false; // После завершения запроса устанавливаем состояние загрузки в false
     }
@@ -108,14 +108,18 @@ export default {
   cursor: pointer;
   transition: transform 0.3s ease;
   margin-bottom: 20px;
-  border: 2px solid #3f51b5; /* Цвет рамки */
-  border-radius: 10px; /* Закругление углов */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Тень */
+  border: 2px solid #3f51b5;
+  /* Цвет рамки */
+  border-radius: 10px;
+  /* Закругление углов */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  /* Тень */
 }
 
 .mailing-card:hover {
   transform: scale(1.05);
 }
+
 .mailing-header {
   display: flex;
   justify-content: space-between;

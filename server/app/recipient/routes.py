@@ -32,3 +32,8 @@ def create_recipient(recipient: RecipientCreate, db: Session = Depends(get_db)):
 @router.get("/by_mailing/{mailing_id}", response_model=List[RecipientBase])
 def get_recipients_by_mailing_id(mailing_id: int, db: Session = Depends(get_db)):
     return crud.get_recipients_by_mailing_id(db, mailing_id)
+
+#Загрузка получателей из API по идентификатору записи истории
+@router.get("/load_recipients/{history_id}")
+def load_recipients_from_history(history_id: int, db: Session = Depends(get_db)):
+    return crud.get_recipients_by_history_id(db, history_id)

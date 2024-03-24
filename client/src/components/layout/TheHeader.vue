@@ -6,7 +6,7 @@
     <v-btn text to="/dashboard">Панель инструментов</v-btn>
     <v-btn text to="/mailings">Рассылки</v-btn>
     <v-btn text to="/templates">Шаблоны</v-btn>
-    <v-btn text to="/scheduledMailings">История</v-btn>
+    <v-btn text to="/historyMailings">История</v-btn>
     <!-- Другие вкладки -->
     <v-spacer></v-spacer>
     <v-toolbar-items>
@@ -42,6 +42,7 @@ const logout = async () => {
 
 <style scoped>
 .app-name {
+  position: relative;
   font-size: 24px;
   letter-spacing: 1px;
   color: rgb(255, 255, 255);
@@ -51,6 +52,19 @@ const logout = async () => {
 .app-name:hover {
   color: rgb(38, 219, 32);
 }
+
+.app-name:hover::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 50px solid rgba(255, 255, 255, 0.116);
+  border-radius: 10px;
+  z-index: -1;
+}
+
 
 .v-btn {
   color: white !important; /* Цвет текста кнопки */

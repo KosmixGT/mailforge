@@ -6,6 +6,7 @@ class RecipientBase(BaseModel):
     mailingid: int
     addressid: int
     deliverystatusid: Optional[int]
+    historyid: int
 
     class Config:
         orm_mode = True
@@ -13,6 +14,8 @@ class RecipientBase(BaseModel):
 class RecipientCreate(BaseModel):
     mailingid: int
     addressid: int
-
+    deliverystatusid: Optional[int]
+    historyid: int
+    
     class Config:
         orm_mode = True

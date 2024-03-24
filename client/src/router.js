@@ -5,7 +5,7 @@ import LoginView from './views/LoginView.vue';
 import DashboardView from './views/DashboardView.vue';
 import ProfileView from './views/ProfileView.vue';
 import MailingsView from "./views/MailingsView.vue";
-import ScheduledMailingsView from "./views/ScheduledMailingsView.vue";
+import HistoryMailingsView from "./views/HistoryMailingsView.vue";
 import TemplatesView from "./views/TemplatesView.vue";
 import NotFound from "./views/NotFound.vue";
 import MailingManageView from './views/MailingManageView.vue';
@@ -55,9 +55,9 @@ const routes = [
     beforeEnter: authGuard,
   },
   {
-    path: '/scheduledMailings',
-    name: 'ScheduledMailings',
-    component: ScheduledMailingsView,
+    path: '/historyMailings',
+    name: 'HistoryMailings',
+    component: HistoryMailingsView,
     beforeEnter: authGuard,
   },
   {

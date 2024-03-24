@@ -51,7 +51,7 @@ export const useMailingStore = defineStore('mailing', {
         // Добавление новой рассылки к списку рассылок в хранилище
         this.mailings.push(newMailing);
         localStorage.setItem('mailings', JSON.stringify(response.data));
-        window.location.reload();
+        // window.location.reload();
       } catch (error) {
         console.error('Error creating mailing:', error);
       }
@@ -76,7 +76,7 @@ export const useMailingStore = defineStore('mailing', {
         const response = await axios.get(`/mailings/by_user/${user_id}`);
         this.mailings = response.data;
         localStorage.setItem('mailings', JSON.stringify(response.data));
-        window.location.reload();
+        // window.location.reload();
       } catch (error) {
         console.error('Error updating mailing:', error);
       }
