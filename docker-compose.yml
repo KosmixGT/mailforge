@@ -4,14 +4,21 @@ services:
 
   backend:
     build: ./server
+    environment:
+        - SECRET_KEY=mysecretkey
+        - ALGORITHM=HS256
+        - ACCESS_TOKEN_EXPIRES_MINUTES=60
+        - DATABASE_URL=postgresql://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
     ports:
       - 5000:5000
     volumes:
-      - ./server:/app
-    command: uvicorn .main:app --reload --host 0.0.0.0 --port 5000
+      - ./server/app:/app
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 5000
 
   frontend:
     build: ./client
+    environment:
+    - VUE_APP_BACKEND_URL=http://localhost:5000
     volumes:
       - './client:/app'
       - '/app/node_modules'

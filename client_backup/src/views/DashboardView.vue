@@ -20,6 +20,18 @@
       </v-col>
 
       <v-col cols="12" md="4">
+        <v-card class="dashboard-card" @click="goToTemplates">
+          <v-card-title class="headline">Управление шаблонами</v-card-title>
+          <v-card-text>
+            Здесь вы можете создавать и редактировать шаблоны для вашей рассылки. Вы можете добавлять переменные, редактировать текст и дизайн шаблонов.
+          </v-card-text>
+          <v-card-actions>
+            <v-btn text color="primary" @click="goToTemplates">Подробнее</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" md="4">
         <v-card class="dashboard-card" @click="goToScheduledMailings">
           <v-card-title class="headline">История рассылок</v-card-title>
           <v-card-text>
@@ -39,11 +51,12 @@ export default {
   methods: {
     goToMailings() {
       // Переход к управлению рассылками
-      this.$router.push('/mailings');
+    },
+    goToTemplates() {
+      // Переход к управлению шаблонами
     },
     goToScheduledMailings() {
       // Переход к запланированным рассылкам
-      this.$router.push('/historyMailings');
     }
   }
 }

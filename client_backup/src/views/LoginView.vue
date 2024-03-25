@@ -23,12 +23,7 @@
                   </v-btn>
                 </v-col>
               </v-row>
-              <v-btn :disabled="isLoading" color="primary" type="submit" block>
-                <span v-if="isLoading">
-                  <v-icon left>mdi-loading</v-icon> Загрузка...
-                </span>
-                <span v-else>Войти</span>
-              </v-btn>
+              <v-btn color="primary" type="submit" block>Войти</v-btn>
             </v-form>
             <v-alert v-if="errorLogIn" type="error" dismissible>
               {{ errorMessage }}
@@ -40,43 +35,27 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
 import { useAuthStore } from "../components/store/userAuth.js";
 
-export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-      passwordType: 'password',
-      authStore: useAuthStore(),
-      isLoading: false
-    };
-  },
-  computed: {
-    errorMessage() {
-      return this.authStore.errorMessage;
-    },
-    errorLogIn() {
-      return this.authStore.errorLogIn;
-    }
-  },
-  methods: {
-    async submitLogDetails() {
-      this.isLoading = true;
-      await this.authStore.login(this.username, this.password);
-      this.isLoading = false;
-    },
-    togglePasswordVisibility() {
-      this.passwordType = this.passwordType === 'password' ? 'text' : 'password';
-    },
-    clearError() {
-      this.authStore.clearError();
-    }
-  },
-  created() {
-    // Вы можете добавить код инициализации, если необходимо
-  }
+const authStore = useAuthStore();
+const username = ref("");
+const password = ref("");
+const passwordType = ref("password");
+
+const { errorMessage, errorLogIn } = authStore;
+
+async function submitLogDetails() {
+  await authStore.login(username.value, password.value);
+}
+
+function togglePasswordVisibility() {
+  passwordType.value = passwordType.value === "password" ? "text" : "password";
+}
+
+function clearError() {
+  authStore.clearError();
 }
 </script>
 
