@@ -5,7 +5,7 @@
     </v-toolbar-title>
     <v-btn text to="/dashboard">Панель инструментов</v-btn>
     <v-btn text to="/mailings">Рассылки</v-btn>
-    <v-btn text to="/templates">Шаблоны</v-btn>
+    <!-- <v-btn text to="/templates">Шаблоны</v-btn> -->
     <v-btn text to="/historyMailings">История</v-btn>
     <!-- Другие вкладки -->
     <v-spacer></v-spacer>
