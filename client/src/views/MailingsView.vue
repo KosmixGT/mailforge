@@ -3,8 +3,11 @@
     <v-row align="center">
       <v-col cols="auto">
         <v-btn color="light-green darken-3" @click="createMailing" class="btn-style">Создать рассылку</v-btn>
+        <v-btn color="primary" @click="openFileDialog" class="btn-style ml-5">
+          <v-icon left>mdi-upload</v-icon> Загрузить рассылки (Excel/CSV)
+        </v-btn>
       </v-col>
-      <v-col cols="9" class="text-center">
+      <v-col cols="4">
         <h1>Список рассылок</h1>
       </v-col>
       <v-col cols="12">
@@ -30,6 +33,21 @@
         </v-col>
       </v-row>
     </div>
+    <v-dialog v-model="dialog" persistent max-width="500">
+      <v-card>
+        <v-card-title>Выберите файл</v-card-title>
+        <v-card-text>
+          <v-file-input v-model="selectedFile" accept=".csv,.xlsx,.xls" label="Выберите файл" outlined hide-details
+            :multiple="false"></v-file-input>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="light-green darken-3" :disabled="!selectedFile" @click="uploadFile">Загрузить</v-btn>
+          <v-btn color="primary" @click="onCloseDialog">{{ !uploadingSuccess ? 'Отмена' : 'Закрыть' }}</v-btn>
+          <v-card-text v-if="uploadingSuccess">Файл успешно загружен</v-card-text>
+          <v-card-text v-if="errorMessage.length > 0">Ошибка: {{ errorMessage }}</v-card-text>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -42,7 +60,11 @@ export default {
     return {
       mailingsStore: useMailingStore(),
       loading: false, // Состояние загрузки данных
-      searchQuery: '' // Добавляем переменную для хранения поискового запроса
+      searchQuery: '', // Добавляем переменную для хранения поискового запроса
+      dialog: false,
+      selectedFile: null,
+      uploadingSuccess: false,
+      errorMessage: '',
     };
   },
   async created() {
@@ -96,6 +118,36 @@ export default {
         return text.slice(0, maxLength) + '...';
       } else {
         return text;
+      }
+    },
+    openFileDialog() {
+      this.uploadingSuccess = false;
+      this.dialog = true;
+    },
+    async uploadFile() {
+      const authStore = useAuthStore();
+      const formData = new FormData();
+      formData.append('file', this.selectedFile[0]);
+      try {
+        const response = await this.mailingsStore.uploadFileMailing(formData, authStore.user.user_data.id)
+        if (!response) {
+          this.selectedFile = null;
+          this.mailingsStore.fetchMailingsByUserId(authStore.user.user_data.id);
+          this.uploadingSuccess = true;
+        } else {
+          this.errorMessage = response.response.data.detail;
+          this.uploadingSuccess = false;
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки рассылок:', error);
+        this.uploadingSuccess = false;
+      }
+    },
+    onCloseDialog() {
+      this.dialog = false, this.selectedFile = null, this.errorMessage = '';
+      if (this.uploadingSuccess) {
+        // Выполните перезагрузку страницы
+        window.location.reload();
       }
     }
   }

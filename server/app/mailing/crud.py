@@ -16,7 +16,12 @@ def get_mailings_by_user_id(db: Session, user_id: int):
 
 def create_mailing(db: Session, mailing: MailingCreate, current_user: User):
     db_mailing = Mailing(**mailing.dict())
-    db_mailing.scheduledtime = datetime.now()
+    #проверяем есть ли дата в переданном объекте
+    if mailing.scheduledtime:
+        db_mailing.scheduledtime = mailing.scheduledtime
+    else:
+        #если нет, то проставляем текущую дату
+        db_mailing.scheduledtime = datetime.now()
     db_mailing.userid = current_user.userid
     db_mailing.statusid = 1
     db.add(db_mailing)

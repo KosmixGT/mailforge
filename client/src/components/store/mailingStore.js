@@ -81,6 +81,19 @@ export const useMailingStore = defineStore('mailing', {
         console.error('Error updating mailing:', error);
       }
     },
+    async uploadFileMailing(file, user_id) {
+      try {
+        await axios.post(`/mailings/upload`, file, {headers: authHeader()})
+        //Обновляем состояние после успешной загрузки файла
+        const response = await axios.get(`/mailings/by_user/${user_id}`);
+        this.mailings = response.data;
+        localStorage.setItem('mailings', JSON.stringify(response.data));
+        // window.location.reload();
+      } catch (error) {
+        console.error('Error uploading mailing:', error);
+        return error
+      }
+    },
     //Загрузка состояния из локального хранилища при создании хранилища
     onInit() {
       const storedMailings = localStorage.getItem('mailings');
