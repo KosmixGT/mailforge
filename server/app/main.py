@@ -7,7 +7,6 @@ from address.routes import router as address_router
 from smtpmailing import router as smtpmailing_router
 from tgmailing import router as tgmailing_router
 from history.routes import router as history_router
-from notisendmailing import router as notisendmailing_router
 from user.authorization import router as authorization_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_jwt_auth import AuthJWT
@@ -23,7 +22,6 @@ app.include_router(recipient_router)
 app.include_router(address_router)
 app.include_router(smtpmailing_router)
 app.include_router(tgmailing_router)
-app.include_router(notisendmailing_router)
 app.include_router(history_router)
 
 app.add_middleware(
