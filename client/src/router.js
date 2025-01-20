@@ -52,7 +52,7 @@ const routes = [
     path: '/templates',
     name: 'Templates',
     component: TemplatesView,
-    beforeEnter: authGuard,
+    beforeEnter: authGuard, // Проверка авторизации
   },
   {
     path: '/historyMailings',

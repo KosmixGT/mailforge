@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="primary" dark fixed>
+  <v-app-bar app color="primary" :fixed="true">
     <v-toolbar-title class="white--text">
       <router-link to="/" class="app-name">MailForge</router-link>
     </v-toolbar-title>
@@ -10,6 +10,7 @@
     <!-- Другие вкладки -->
     <v-spacer></v-spacer>
     <v-toolbar-items>
+      <v-switch inset color="info" @change="toggleTheme()" prepend-icon="mdi-theme-light-dark" class="mr-16 d-flex align-center justify-center"></v-switch>
       <v-btn v-if="!isLoggedIn" @click="goToRegistration">Регистрация</v-btn>
       <v-btn v-if="!isLoggedIn" @click="goToLogin">Вход</v-btn>
       <v-btn v-if="isLoggedIn" @click="logout">Выйти - {{ authStore.user.user_data.username }}</v-btn>
@@ -17,28 +18,51 @@
   </v-app-bar>
 </template>
 
-<script setup>
+<script>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store/userAuth.js";
 
-const router = useRouter();
-const authStore = useAuthStore();
+import { useTheme } from 'vuetify'
 
-const isLoggedIn = computed(() => authStore.$state.isAuthenticated);
+export default {
+  data() {
+    return {
+    };
+  },
+  created() {
+    // Initialization code here if needed
+  },
+  methods: {
+    goToRegistration() {
+      this.$router.push({ name: 'Registration' });
+    },
+    goToLogin() {
+      this.$router.push({ name: 'Authorization' });
+    },
+    async logout() {
+      this.authStore.logout();
+    }
 
-const goToRegistration = () => {
-  router.push({ name: 'Registration' });
-}
+  },
+  setup() {
+    const theme = useTheme();
+    const router = useRouter();
+    const authStore = useAuthStore();
+    const isLoggedIn = computed(() => authStore.$state.isAuthenticated);
+    const toggleTheme = () => {
+      if (theme.global.current.value.dark) {
+        theme.global.name.value = 'light';
+      } else {
+        theme.global.name.value = 'customDarkTheme';
+      }
+    };
 
-const goToLogin = () => {
-  router.push({ name: 'Authorization' });
-}
-
-const logout = async () => {
-  authStore.logout();
+    return { router, authStore, isLoggedIn, toggleTheme };
+  }
 }
 </script>
+
 
 <style scoped>
 .app-name {
@@ -46,7 +70,8 @@ const logout = async () => {
   font-size: 24px;
   letter-spacing: 1px;
   color: rgb(255, 255, 255);
-  transition: color 0.3s; /* Плавное изменение цвета */
+  transition: color 0.3s;
+  /* Плавное изменение цвета */
 }
 
 .app-name:hover {
@@ -67,7 +92,8 @@ const logout = async () => {
 
 
 .v-btn {
-  color: white !important; /* Цвет текста кнопки */
+  color: white !important;
+  /* Цвет текста кнопки */
 }
 
 @media only screen and (max-width: 768px) {
@@ -76,4 +102,3 @@ const logout = async () => {
   }
 }
 </style>
-

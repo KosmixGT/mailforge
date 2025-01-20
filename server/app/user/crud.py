@@ -26,7 +26,7 @@ def create_user(db: Session, user: UserSchema):
     #Если хотим id в виде хеш-строки
     # user_id =  str(uuid.uuid4())
 
-    # #checking if such ID already exists:
+    # проверка того, существует ли уже такой идентификатор
     # while get_user_by_id(db=db, user_id = user_id):
     #     user_id =  str(uuid.uuid4())
 

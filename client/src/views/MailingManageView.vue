@@ -66,7 +66,15 @@
 
             <!-- Поля для параметров рассылки для Telegram -->
             <div v-else-if="deliveryMethod === 'Telegram'">
-              <v-text-field v-model="telegramToken" label="Токен Telegram" :rules="tgBotTokenInputRules"></v-text-field>
+              <v-text-field  v-model="telegramToken" label="Токен Telegram" :rules="tgBotTokenInputRules" :type="passwordType"></v-text-field>
+              <v-col  class="d-flex align-center">
+                  <v-btn icon @click="togglePasswordVisibility"
+                    :class="{ 'show-password': passwordType === 'password' }">
+                    <v-icon>
+                      {{ passwordType === 'password' ? 'mdi-eye' : 'mdi-eye-off' }}
+                    </v-icon>
+                  </v-btn>
+                </v-col>
               <v-btn color="primary" @click="sendTelegramMailing">Отправить рассылку в ТГ</v-btn>
             </div>
 
