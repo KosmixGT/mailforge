@@ -1,6 +1,8 @@
 {
   "scripts": {
     "serve": "vue-cli-service serve",
+    "test:unit": "jest",
+    "test:integration": "jest --config jest.integration.config.js",
     "build": "vue-cli-service build"
   },
   "dependencies": {
