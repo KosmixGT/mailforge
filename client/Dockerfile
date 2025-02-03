@@ -1,24 +1,36 @@
-# Dockerfile for frontend service
+# Этап сборки
+FROM node:16-alpine as build-stage
 
-# Use the official Node.js image from Docker Hub
-FROM node:16
+# Установка глобальных зависимостей
+RUN npm install -g @vue/cli@5.0.8
 
-# Set the working directory in the container
+# Установка рабочей директории
 WORKDIR /app
 
-RUN npm install @vue/cli@5.0.8 -g
-
-# Copy package.json and package-lock.json to the working directory
+# Копирование package.json и package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Установка зависимостей
 RUN npm install
 
-# Copy the rest of the application's code to the working directory
+# Копирование остальных файлов проекта
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 8080
+# Сборка проекта
+RUN npm run build
 
-# Command to run the application
-CMD ["npm", "run", "serve"]
+# Финальный этап
+FROM nginx:alpine as production-stage
+
+# Копирование собранных файлов из этапа сборки
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Копирование конфигурации Nginx (если требуется)
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Открытие порта
+EXPOSE 80
+
+# Запуск Nginx
+CMD ["nginx", "-g", "daemon off;"]

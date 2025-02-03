@@ -15,28 +15,28 @@ from user.schemas import Settings
 app = FastAPI(title="Система управления рассылками")
 Base.metadata.create_all(bind=engine)
 
-app.include_router(user_router)
-app.include_router(authorization_router)
-app.include_router(mailing_router)
-app.include_router(recipient_router)
-app.include_router(address_router)
-app.include_router(smtpmailing_router)
-app.include_router(tgmailing_router)
-app.include_router(history_router)
+app.include_router(user_router, prefix="/api")
+app.include_router(authorization_router, prefix="/api")
+app.include_router(mailing_router, prefix="/api")
+app.include_router(recipient_router, prefix="/api")
+app.include_router(address_router, prefix="/api")
+app.include_router(smtpmailing_router, prefix="/api")
+app.include_router(tgmailing_router, prefix="/api")
+app.include_router(history_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=['*'],
-    allow_origins=["http://localhost:8080"],
+     allow_origins=['*'],
+    # allow_origins=["http://localhost:5000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Create initialized database table
-@app.on_event("startup")
-async def startup():
-    Base.metadata.create_all(bind=engine)
+# @app.on_event("startup")
+# async def startup():
+#     Base.metadata.create_all(bind=engine)
 
 @AuthJWT.load_config
 def get_config():

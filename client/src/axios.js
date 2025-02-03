@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useAuthStore } from "../src/components/store/userAuth.js";
 
-axios.defaults.baseURL = process.env.VUE_APP_BACKEND_URL;
+axios.defaults.baseURL = process.env.VUE_APP_BACKEND_URL + "/api";
+
 // axios interceptor for specific URL - instance
 
 //response interceptor

@@ -20,6 +20,7 @@
 **/Dockerfile*
 **/node_modules
 **/npm-debug.log
+**/dist
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
