@@ -1,10 +1,10 @@
 FROM python:3.12.2-slim
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     python3-dev \
-    libpq-dev
+    libpq-dev \
+    build-essential
 
 RUN mkdir app
 WORKDIR /app
