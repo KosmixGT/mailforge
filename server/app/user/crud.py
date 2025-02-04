@@ -1,13 +1,12 @@
 from sqlalchemy.orm import Session
-from models import User
-from user.schemas import UserSchema, CreateUserSchema
+from app.models import User
+from app.user.schemas import UserSchema, CreateUserSchema
 import uuid
-from password_hashing import Hash
+from app.password_hashing import Hash
 from fastapi import HTTPException, status
 
 def get_user(db: Session, user_id: int):
     return db.query(User).filter(User.userid == user_id).first()
-
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(User).offset(skip).limit(limit).all()

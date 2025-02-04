@@ -3,13 +3,13 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from app.database import get_db
 
-from address.schemas import AddressBase, AddressCreate
-import address.crud as crud
+from app.address.schemas import AddressBase, AddressCreate
+import app.address.crud as crud
 
-from auth import get_current_user
-from models import User
+from app.auth import get_current_user
+from app.models import User
 
 router = APIRouter(prefix='/addresses', tags=['address'])
 

@@ -3,14 +3,14 @@ from typing import List, Tuple
 from fastapi import APIRouter, HTTPException, status
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from app.database import get_db
 from datetime import datetime
 
-from history.schemas import MailingHistoryBase, MailingHistoryCreate
-import history.crud as crud
+from app.history.schemas import MailingHistoryBase, MailingHistoryCreate
+import app.history.crud as crud
 
-from auth import get_current_user
-from models import User
+from app.auth import get_current_user
+from app.models import User
 
 router = APIRouter(prefix='/history', tags=['MailingHistory'])
 

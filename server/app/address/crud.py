@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from models import Address
-from address.schemas import AddressBase, AddressCreate
-from models import User
-from auth import get_current_user
+from app.models import Address
+from app.address.schemas import AddressBase, AddressCreate
+from app.models import User
+from app.auth import get_current_user
 from datetime import datetime
 
 def get_address(db: Session, address_id: int):

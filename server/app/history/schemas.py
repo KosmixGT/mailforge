@@ -1,20 +1,16 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 
 class MailingHistoryBase(BaseModel):
     historyid: int
     mailingid: int
     senttime: datetime
     deliverystatusid: int
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class MailingHistoryCreate(BaseModel):
     mailingid: int
     senttime: datetime
     deliverystatusid: int
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

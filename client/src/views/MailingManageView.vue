@@ -546,7 +546,8 @@ export default {
         })
         .catch(error => {
           this.addInHistory(false, true)
-          this.showError(`Ошибка отправления рассылки: ${error.message}`);
+          const errorMessage = error.response?.data?.detail || error.message;
+          this.showError(`Ошибка отправления рассылки: ${errorMessage}`);
           // console.error('Error sending email:', error); // Обработка ошибки при отправке запроса
           if (error.isAxiosError) {
             // Данные запроса можно найти в свойстве config

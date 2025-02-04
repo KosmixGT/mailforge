@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from models import Recipient, Address
-from recipient.schemas import RecipientBase, RecipientCreate
-from models import User
-from auth import get_current_user
+from app.models import Recipient, Address
+from app.recipient.schemas import RecipientBase, RecipientCreate
+from app.models import User
+from app.auth import get_current_user
 from datetime import datetime
 
 def get_recipient(db: Session, recipient_id: int):

@@ -1,16 +1,14 @@
 from fastapi import FastAPI
-from database import Base, engine
-from user.routes import router as user_router
-from mailing.routes import router as mailing_router
-from recipient.routes import router as recipient_router
-from address.routes import router as address_router
-from smtpmailing import router as smtpmailing_router
-from tgmailing import router as tgmailing_router
-from history.routes import router as history_router
-from user.authorization import router as authorization_router
+from app.database import Base, engine
+from app.user.routes import router as user_router
+from app.mailing.routes import router as mailing_router
+from app.recipient.routes import router as recipient_router
+from app.address.routes import router as address_router
+from app.smtpmailing import router as smtpmailing_router
+from app.tgmailing import router as tgmailing_router
+from app.history.routes import router as history_router
+from app.user.authorization import router as authorization_router
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_jwt_auth import AuthJWT
-from user.schemas import Settings
 
 app = FastAPI(title="Система управления рассылками")
 Base.metadata.create_all(bind=engine)
@@ -26,21 +24,12 @@ app.include_router(history_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
-     allow_origins=['*'],
+    allow_origins=['*'],
     # allow_origins=["http://localhost:5000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Create initialized database table
-# @app.on_event("startup")
-# async def startup():
-#     Base.metadata.create_all(bind=engine)
-
-@AuthJWT.load_config
-def get_config():
-    return Settings()
 
 @app.get('/', tags=["root"])
 async def root():

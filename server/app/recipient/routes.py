@@ -3,13 +3,13 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from app.database import get_db
 
-from recipient.schemas import RecipientBase, RecipientCreate
-import recipient.crud as crud
+from app.recipient.schemas import RecipientBase, RecipientCreate
+import app.recipient.crud as crud
 
-from auth import get_current_user
-from models import User
+from app.auth import get_current_user
+from app.models import User
 
 router = APIRouter(prefix='/recipients', tags=['recipient'])
 

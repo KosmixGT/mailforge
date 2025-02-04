@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from models import Mailinghistory, Mailing
-from history.schemas import MailingHistoryBase, MailingHistoryCreate
-from models import User
-from auth import get_current_user
+from app.models import Mailinghistory, Mailing
+from app.history.schemas import MailingHistoryBase, MailingHistoryCreate
+from app.models import User
+from app.auth import get_current_user
 from datetime import datetime
 
 def get_mailing_history(db: Session, mailing_id: int):

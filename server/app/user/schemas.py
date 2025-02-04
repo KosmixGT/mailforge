@@ -1,40 +1,34 @@
 from typing import List, Optional, Generic, TypeVar
 
-from pydantic import BaseModel , Field
-from pydantic.generics import GenericModel
+from pydantic import ConfigDict, BaseModel , Field
 
-from config import settings
+from app.config import settings
 
 T = TypeVar('T')
 
-class Request(GenericModel, Generic[T]):
+class Request(BaseModel, Generic[T]):
     parameter: Optional[T] = Field(...)
 
-class Response(GenericModel, Generic[T]):
+class Response(BaseModel, Generic[T]):
     code: str
     status: str
     message: str
     result: Optional[T]
 
 class UserSchema(BaseModel):
-    userid: Optional[int]
+    userid: Optional[int] = None
     name: str
     email: str
     password: str
     roleid: int
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class CreateUserSchema(BaseModel):
     name: str
     email: str
     password: str
     roleid: int
-
-    class Config:
-        from_attributes = True
-        
+    model_config = ConfigDict(from_attributes=True)
 class RequestUser(BaseModel):
     parameter: UserSchema = Field(...)
 

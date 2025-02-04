@@ -3,21 +3,19 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status, UploadFile, File
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from app.database import get_db
 from datetime import datetime
 
-from mailing.schemas import MailingBase, MailingCreate
-import mailing.crud as crud
+from app.mailing.schemas import MailingBase, MailingCreate
+import app.mailing.crud as crud
 
-from auth import get_current_user
-from models import User
+from app.auth import get_current_user
+from app.models import User
 
 from io import BytesIO
 from io import StringIO
 import csv
 import openpyxl
-import json
-import re
 
 router = APIRouter(prefix='/mailings', tags=['mailing'])
 

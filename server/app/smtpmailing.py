@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from typing import List
 import smtplib
@@ -20,22 +20,38 @@ class EmailData(BaseModel):
 # Обработчик для отправки электронного письма
 @router.post("/send_email")
 async def send_email(email_data: EmailData):
-    # Создаем объект SMTP-клиента
-    with smtplib.SMTP(email_data.smtp_host, email_data.smtp_port) as server:
-        # Подключаемся к серверу
-        server.starttls()
-        # Логинимся на сервере
-        server.login(email_data.smtp_username, email_data.smtp_password)
+    try:
+        with smtplib.SMTP(email_data.smtp_host, email_data.smtp_port) as server:
+            server.starttls()
+            server.login(email_data.smtp_username, email_data.smtp_password)
+            
+            message = MIMEMultipart()
+            message['From'] = email_data.smtp_username
+            message['To'] = ", ".join(email_data.recipient_emails)
+            message['Subject'] = email_data.subject
+            message.attach(MIMEText(email_data.body, 'plain'))
+            
+            server.sendmail(email_data.smtp_username, email_data.recipient_emails, message.as_string())
         
-        # Создаем сообщение
-        message = MIMEMultipart()
-        message['From'] = email_data.smtp_username
-        message['To'] = ", ".join(email_data.recipient_emails)
-        message['Subject'] = email_data.subject
-        message.attach(MIMEText(email_data.body, 'plain'))
+        return {"message": "E-mail рассылка успешно отправлена"}
         
-        # Отправляем сообщение
-        server.sendmail(email_data.smtp_username, email_data.recipient_emails, message.as_string())
-    
-    # Возвращаем ответ клиенту
-    return {"message": "E-mail рассылка успешно отправлена"}
+    except smtplib.SMTPAuthenticationError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Ошибка аутентификации SMTP: неверное имя пользователя или пароль"
+        )
+    except smtplib.SMTPConnectError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Не удалось подключиться к SMTP серверу"
+        )
+    except smtplib.SMTPException as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка SMTP: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Произошла ошибка при отправке: {str(e)}"
+        )
