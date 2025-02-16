@@ -1,39 +1,46 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.database import Base, engine
-from app.user.routes import router as user_router
-from app.mailing.routes import router as mailing_router
-from app.recipient.routes import router as recipient_router
-from app.address.routes import router as address_router
-from app.smtpmailing import router as smtpmailing_router
-from app.tgmailing import router as tgmailing_router
-from app.history.routes import router as history_router
-from app.user.authorization import router as authorization_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.infrastructure.database.base import Base, engine
+from app.api.v1 import mailing, user, recipient, address, history, smtp, telegram, auth
 
-app = FastAPI(title="Система управления рассылками")
-Base.metadata.create_all(bind=engine)
 
-app.include_router(user_router, prefix="/api")
-app.include_router(authorization_router, prefix="/api")
-app.include_router(mailing_router, prefix="/api")
-app.include_router(recipient_router, prefix="/api")
-app.include_router(address_router, prefix="/api")
-app.include_router(smtpmailing_router, prefix="/api")
-app.include_router(tgmailing_router, prefix="/api")
-app.include_router(history_router, prefix="/api")
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    await init_db()
+    yield
+    # Shutdown
+    await engine.dispose()
+
+
+app = FastAPI(title="Система управления рассылками", lifespan=lifespan)
+
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
-    # allow_origins=["http://localhost:5000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get('/', tags=["root"])
-async def root():
-    return "Hello World!"
+# Register API v1 routers
+app.include_router(mailing.router, prefix="/api/v1")
+app.include_router(user.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(recipient.router, prefix="/api/v1")
+app.include_router(address.router, prefix="/api/v1")
+app.include_router(history.router, prefix="/api/v1")
+app.include_router(smtp.router, prefix="/api/v1")
+app.include_router(telegram.router, prefix="/api/v1")
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+@app.get("/", tags=["root"])
+async def root():
+    return {"message": "Mailing System API"}
