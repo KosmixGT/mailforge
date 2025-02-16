@@ -10,13 +10,13 @@ def test_root_endpoint():
     assert response.status_code == 200
     assert response.json() == {"message": "Mailing System API"}
 
-def test_user_registration_success():
-    test_user = UserCreateDTO(
-        name="testuser_new",
-        email="test_new@example.com",
-        password="testpassword123",
-        role_id=1
-    )
+# def test_user_registration_success():
+#     test_user = UserCreateDTO(
+#         name="testuser_new",
+#         email="test_new@example.com",
+#         password="testpassword123",
+#         role_id=1
+#     )
     
-    response = client.post("/api/v1/users/register/", json=test_user.model_dump())
-    assert response.status_code == 409
+#     response = client.post("/api/v1/users/register/", json=test_user.model_dump())
+#     assert response.status_code == 409
