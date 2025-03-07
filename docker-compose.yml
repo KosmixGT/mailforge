@@ -1,23 +1,104 @@
-version: '3.4'
+version: '3.8'
 
 services:
-
-  backend:
-    build: ./server
-    environment:
-        - SECRET_KEY=mysecretkey
-        - ALGORITHM=HS256
-        - ACCESS_TOKEN_EXPIRES_MINUTES=60
-        - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
+  rabbitmq:
+    image: rabbitmq:3-management
     ports:
-      - 5000:5000
+      - "5672:5672"    # AMQP протокол
+      - "15672:15672"  # Web интерфейс
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASSWORD=guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
     volumes:
-      - ./server:/app
-    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 5000
-
-  frontend:
-    build: ./client
+      - ./server/app:/app/app
+      - ./services/shared:/shared
     environment:
-      - VUE_APP_BACKEND_URL=http://backend:5000  # Используем имя сервиса "backend"
+      - SECRET_KEY=mysecretkey
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRES_MINUTES=60
+      - PYTHONPATH=/app
     ports:
-      - 8080:80
+      - "5000:8000"
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+  # auth:
+  #   build:
+  #     context: .
+  #     dockerfile: services/auth/Dockerfile
+  #   volumes:
+  #     - ./services/auth/app:/app/app
+  #     - ./services/shared:/shared
+  #     - ./.env:/app/.env
+  #   environment:
+  #     - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
+  #     - PYTHONPATH=/app
+  #   ports:
+  #     - "8001:8000"
+  #   command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+  mailing:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: services/mailing/Dockerfile
+    volumes:
+      - ./services/mailing/app:/app/app
+      - ./services/shared:/shared
+      - ./.env:/app/.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
+      - PYTHONPATH=/app
+    ports:
+      - "8002:8000"
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+  delivery:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: services/delivery/Dockerfile
+    volumes:
+      - ./services/delivery/app:/app/app
+      - ./.env:/app/.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
+      - PYTHONPATH=/app
+    ports:
+      - "8003:8000"
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  
+  history:
+    build:
+      context: .
+      dockerfile: services/history/Dockerfile
+    volumes:
+      - ./services/history/app:/app/app
+      - ./services/shared:/shared
+      - ./.env:/app/.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
+      - PYTHONPATH=/app
+    ports:
+      - "8004:8000"
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+
+  # frontend:
+  #   build: ./client
+  #   environment:
+  #     - VUE_APP_BACKEND_URL=http://gateway:5000
+  #   ports:
+  #     - 8080:80

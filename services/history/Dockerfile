@@ -12,9 +12,9 @@ COPY services/shared /shared
 RUN pip install -e /shared
 
 # Install service dependencies
-COPY server/requirements.txt .
+COPY services/history/requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy server code
-COPY server/app ./app
+# Copy service code
+COPY services/history/app ./app
