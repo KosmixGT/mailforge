@@ -11,16 +11,16 @@ jobs:
   lint:
     runs-on: ubuntu-latest 
     steps:
-      - name: Check ASYNC_DATABASE_URL Prefix
+      - name: Check if ASYNC_DATABASE_URL is set
         run: |
-          if [ -z "$ASYNC_DATABASE_URL" ]; then
-            echo "❌ ASYNC_DATABASE_URL is empty!"
-            exit 1
+          if [ -z "${{ secrets.ASYNC_DATABASE_URL }}" ]; then
+            echo "ASYNC_DATABASE_URL is not set!"
+            exit 1  # Останавливает выполнение, если переменной нет
           else
-            echo "✅ ASYNC_DATABASE_URL starts with: $(echo $ASYNC_DATABASE_URL | cut -c1-8)****"
+            echo "ASYNC_DATABASE_URL is set"
           fi
         env:
-          ASYNC_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          ASYNC_DATABASE_URL: ${{ secrets.ASYNC_DATABASE_URL }}
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -43,7 +43,7 @@ jobs:
       matrix:
         service: [server, auth, mailing, delivery, history]
     env:
-      ASYNC_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      ASYNC_DATABASE_URL: ${{ secrets.ASYNC_DATABASE_URL }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
