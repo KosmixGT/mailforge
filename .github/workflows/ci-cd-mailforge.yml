@@ -9,15 +9,18 @@ on:
 
 jobs:  
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
     steps:
-      - name: Debug environment variables
+      - name: Check ASYNC_DATABASE_URL Prefix
         run: |
-          if ! env | grep -q "ASYNC_DATABASE_URL"; then
-            echo "❌ ERROR: ASYNC_DATABASE_URL is not set!"
+          if [ -z "$ASYNC_DATABASE_URL" ]; then
+            echo "❌ ASYNC_DATABASE_URL is empty!"
             exit 1
+          else
+            echo "✅ ASYNC_DATABASE_URL starts with: $(echo $ASYNC_DATABASE_URL | cut -c1-8)****"
           fi
-          echo "✅ ASYNC_DATABASE_URL is set."
+        env:
+          ASYNC_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
