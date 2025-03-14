@@ -2,6 +2,7 @@ from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from mailforge_shared.core.config.database import Base
 from app.domain.models.user_model import User as DomainUser
+from app.infrastructure.database.models.user_role import UserRoleModel
 
 
 class UserModel(Base):
@@ -13,7 +14,7 @@ class UserModel(Base):
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     roleid: Mapped[int] = mapped_column(ForeignKey("userroles.roleid"), nullable=False)
 
-    userrole = relationship("UserRoleModel")
+    userrole = relationship(UserRoleModel)
 
     def to_domain(self) -> DomainUser:
         return DomainUser(
