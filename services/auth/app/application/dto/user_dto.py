@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from services.auth.app.domain.models.user_model import User
+from app.domain.models.user_model import User
 from typing import Optional
 
 

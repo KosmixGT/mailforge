@@ -1,9 +1,9 @@
 from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.auth.app.domain.interfaces.user_repository_impl import UserRepository
-from services.auth.app.domain.models.user_model import User
-from services.auth.app.infrastructure.database.models.user_db_model import UserModel
+from app.domain.interfaces.user_repository_impl import UserRepository
+from app.domain.models.user_model import User
+from app.infrastructure.database.models.user_db_model import UserModel
 
 
 class PostgresUserRepository(UserRepository):

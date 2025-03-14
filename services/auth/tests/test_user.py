@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from services.auth.app.application.dto.user_dto import UserCreateDTO
+from app.application.dto.user_dto import UserCreateDTO
 
 client = TestClient(app=app)
 
