@@ -6,12 +6,13 @@ from app.application.dto.mailing import MailingDTO, MailingCreateDTO
 from app.application.services.mailing_service import MailingService
 from app.application.services.file_processing_service import FileProcessingService
 from app.infrastructure.repositories.mailing import PostgresMailingRepository
-from app.main import message_queue
 
 router = APIRouter(prefix="/mailings", tags=["mailing"])
 
 
 async def get_mailing_service(db: AsyncSession = Depends(get_db)) -> MailingService:
+    from app.main import message_queue
+
     repository = PostgresMailingRepository(db)
     return MailingService(repository, message_queue)
 
