@@ -30,27 +30,31 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     strategy:
-    # Указываем, какие сервисы будут тестироваться
       matrix:
         service: [server, auth, mailing, delivery, history]
     steps:
       - uses: actions/checkout@v2
-        # Установка Python
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.12.2'
-        # Установка зависимостей
       - name: Install dependencies
         run: |
-          cd services/${{ matrix.service }}
+          if [ "${{ matrix.service }}" == "server" ]; then
+            cd server
+          else
+            cd services/${{ matrix.service }}
+          fi
           pip install -r requirements.txt
           pip install pytest pytest-cov
-        # Тестирование бэкэнда
       - name: Run tests
         run: |
-          cd services/${{ matrix.service }}
-          pytest tests/ --cov=app
+          if [ "${{ matrix.service }}" == "server" ]; then
+            cd server
+          else
+            cd services/${{ matrix.service }}
+          fi
+          pytest tests/ --cov=app        
 
       # Тестирование фронтенда
       - name: Set up Node.js
