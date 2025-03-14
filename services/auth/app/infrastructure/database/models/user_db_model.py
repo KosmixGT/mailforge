@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from mailforge_shared.core.config.database import Base
 from services.auth.app.domain.models.user_model import User as DomainUser
 
+
 class UserModel(Base):
     __tablename__ = "users"
 

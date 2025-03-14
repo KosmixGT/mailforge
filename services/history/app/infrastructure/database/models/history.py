@@ -8,7 +8,9 @@ class MailingHistoryModel(Base):
     __tablename__ = "mailinghistory"
 
     historyid = Column(Integer, primary_key=True)
-    mailingid: Mapped[int] = mapped_column(ForeignKey("mailings.mailingid"), nullable=False)
+    mailingid: Mapped[int] = mapped_column(
+        ForeignKey("mailings.mailingid"), nullable=False
+    )
     senttime = Column(DateTime, nullable=False)
     deliverystatusid = Column(Integer)  # Просто храним ID статуса
     # deliverystatusid = Column(ForeignKey("deliverystatuses.deliverystatusid"))

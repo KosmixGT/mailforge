@@ -15,7 +15,9 @@ class MailingModel(Base):
     title = Column(String(255), nullable=False)
     messagetext = Column(Text, nullable=False)
     scheduledtime = Column(DateTime)
-    statusid: Mapped[int] = mapped_column(ForeignKey("mailingstatuses.statusid"), nullable=False)
+    statusid: Mapped[int] = mapped_column(
+        ForeignKey("mailingstatuses.statusid"), nullable=False
+    )
 
     mailingstatus = relationship("MailingStatusModel")
     # user = relationship("UserModel")
