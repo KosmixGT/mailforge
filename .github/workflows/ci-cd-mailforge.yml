@@ -18,7 +18,7 @@ jobs:
           python-version: '3.12.2'
       - name: Install lint dependencies
         run: |
-          pip install flake8 black mypy
+          pip install flake8 black mypy types-requests
         # Запуск линтинга
       - name: Run linting
         run: |
