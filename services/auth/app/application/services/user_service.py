@@ -33,8 +33,7 @@ class UserService:
             return UserDTO.from_domain(created_user)
         except IntegrityError:
             raise HTTPException(
-                status_code=400,
-                detail="User with this email already exists"
+                status_code=400, detail="User with this email already exists"
             )
 
     async def authenticate_user(

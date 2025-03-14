@@ -2,10 +2,10 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
-from jose import JWTError 
+from jose import JWTError
 from mailforge_shared.core.config.settings import settings
-from mailforge_shared.core.config.database import get_db 
-from app.application.services.user_service import UserService 
+from mailforge_shared.core.config.database import get_db
+from app.application.services.user_service import UserService
 from app.infrastructure.repositories.user import PostgresUserRepository
 from mailforge_shared.core.utils.token_utils import TokenHelper
 

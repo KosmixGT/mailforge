@@ -28,7 +28,7 @@ class RecipientModel(Base):
     # )
     historyid = Column(Integer)
 
-    address = relationship("AddressModel")   
+    address = relationship("AddressModel")
     mailing = relationship("MailingModel")
 
     def to_domain(self) -> DomainRecipient:

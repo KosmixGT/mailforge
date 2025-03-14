@@ -5,8 +5,11 @@ from app.domain.models.mailing import Mailing
 from app.application.dto.mailing import MailingDTO, MailingCreateDTO
 from mailforge_shared.core.interfaces.message_queue import MessageQueue
 
+
 class MailingService:
-    def __init__(self, mailing_repository: MailingRepository, message_queue: MessageQueue):
+    def __init__(
+        self, mailing_repository: MailingRepository, message_queue: MessageQueue
+    ):
         self.repository = mailing_repository
         self.queue = message_queue
 
@@ -30,24 +33,23 @@ class MailingService:
             title=mailing_dto.title,
             message_text=mailing_dto.message_text,
             user_id=user_id,
-            scheduled_time=mailing_dto.scheduled_time or datetime.now(), 
+            scheduled_time=mailing_dto.scheduled_time or datetime.now(),
             status_id=1,
         )
         created_mailing = await self.repository.create(mailing)
 
-        
         message_data = {
             "mailing_id": created_mailing.id,
             "type": "telegram",  # or get from DTO
             "data": {
                 "title": created_mailing.title,
                 "message": created_mailing.message_text,
-                "scheduled_time": str(created_mailing.scheduled_time)
-            }
+                "scheduled_time": str(created_mailing.scheduled_time),
+            },
         }
-        
+
         await self.queue.publish("mailings.created", message_data)
-        
+
         return MailingDTO.from_domain(created_mailing)
 
     async def update_mailing(

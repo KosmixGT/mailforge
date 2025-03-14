@@ -7,12 +7,12 @@ import logging
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 LOG = logging.getLogger(__name__)
 LOG.info("DELIVERY API is starting up")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -23,20 +23,23 @@ async def lifespan(app: FastAPI):
         consumer_task.cancel()
         await consumer_task
 
+
 app = FastAPI(title="Delivery Service", log_level="trace", lifespan=lifespan)
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get('/', tags=["root"])
+
+@app.get("/", tags=["root"])
 async def root():
     return "Delivery Service!"
+
 
 # Include routers
 from app.api.v1.smtp import router as smtp_router

@@ -2,17 +2,18 @@ from typing import Dict, Any
 import httpx
 from fastapi import HTTPException
 
+
 class AuthService:
     def __init__(self, base_url: str = "http://auth:8000"):
         self.base_url = base_url
         self.client = httpx.AsyncClient(base_url=base_url)
-  
+
     async def login(self, username: str, password: str) -> Dict[str, Any]:
         """Аутентификация пользователя"""
         try:
             response = await self.client.post(
                 "/api/v1/auth/jwt/create",
-                data={"username": username, "password": password}
+                data={"username": username, "password": password},
             )
             return response.json()
         except httpx.HTTPError as e:
@@ -22,8 +23,7 @@ class AuthService:
         """Проверка токена"""
         try:
             response = await self.client.get(
-                "/api/user/verify/",
-                headers={"Authorization": f"Bearer {token}"}
+                "/api/user/verify/", headers={"Authorization": f"Bearer {token}"}
             )
             return response.json()
         except httpx.HTTPError as e:

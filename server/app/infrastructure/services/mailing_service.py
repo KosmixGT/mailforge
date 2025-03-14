@@ -2,11 +2,12 @@ from typing import Dict, Any, List
 import httpx
 from fastapi import HTTPException
 
+
 class MailingService:
     def __init__(self, base_url: str = "http://mailing:8000"):
         self.base_url = base_url
         self.client = httpx.AsyncClient(base_url=base_url)
-    
+
     async def get_mailings(self) -> List[Dict[str, Any]]:
         """Получение списка рассылок"""
         try:
@@ -18,10 +19,7 @@ class MailingService:
     async def create_mailing(self, mailing_data: Dict[str, Any]) -> Dict[str, Any]:
         """Создание новой рассылки"""
         try:
-            response = await self.client.post(
-                "/api/mailings/create",
-                json=mailing_data
-            )
+            response = await self.client.post("/api/mailings/create", json=mailing_data)
             return response.json()
         except httpx.HTTPError as e:
             raise HTTPException(status_code=400, detail=str(e))

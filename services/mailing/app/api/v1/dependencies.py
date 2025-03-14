@@ -5,9 +5,9 @@ from mailforge_shared.core.interfaces.message_queue import MessageQueue
 from app.application.services.mailing_service import MailingService
 from app.infrastructure.repositories.mailing import PostgresMailingRepository
 
+
 async def get_mailing_service(
-    message_queue: MessageQueue,
-    db: AsyncSession = Depends(get_db)
+    message_queue: MessageQueue, db: AsyncSession = Depends(get_db)
 ) -> MailingService:
     repository = PostgresMailingRepository(db)
     return MailingService(repository, message_queue)
