@@ -47,6 +47,7 @@ jobs:
           fi
           pip install -r requirements.txt
           pip install pytest pytest-cov httpx
+          pip install -e ../../services/shared
       - name: Run tests
         run: |
           if [ "${{ matrix.service }}" == "server" ]; then
