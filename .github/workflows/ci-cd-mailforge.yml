@@ -46,7 +46,7 @@ jobs:
             cd services/${{ matrix.service }}
           fi
           pip install -r requirements.txt
-          pip install pytest pytest-cov
+          pip install pytest pytest-cov httpx
       - name: Run tests
         run: |
           if [ "${{ matrix.service }}" == "server" ]; then
