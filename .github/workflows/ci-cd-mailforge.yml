@@ -34,6 +34,7 @@ jobs:
         service: [server, auth, mailing, delivery, history]
     env:
       DATABASE_URL: ${{ secrets.ASYNC_DATABASE_URL }}
+      PYTHONPATH: ${{ github.workspace }}/services
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
