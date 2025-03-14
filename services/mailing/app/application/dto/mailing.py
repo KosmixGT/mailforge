@@ -13,7 +13,7 @@ class MailingDTO(BaseModel):
     status_id: int
 
     @staticmethod
-    def from_domain(mailing: Mailing) -> "MailingDTO":
+    def from_domain(mailing: Mailing) -> Optional["MailingDTO"]:
         if not mailing:
             return None
         return MailingDTO(

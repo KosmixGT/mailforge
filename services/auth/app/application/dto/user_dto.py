@@ -1,10 +1,10 @@
 from pydantic import BaseModel, EmailStr
+from services.auth.app.domain.models.user_model import User
 from typing import Optional
-from app.domain.models.user import User
 
 
 class UserDTO(BaseModel):
-    id: int
+    id: Optional[int]
     name: str
     email: EmailStr
     role_id: int

@@ -15,7 +15,8 @@ class SMTPService:
                 except smtplib.SMTPAuthenticationError:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail="Ошибка аутентификации SMTP: неверное имя пользователя или пароль",
+                        detail="Ошибка аутентификации SMTP:"
+                        " неверное имя пользователя или пароль",
                     )
 
                 message = MIMEMultipart()

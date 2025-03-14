@@ -1,9 +1,9 @@
 from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
-from app.domain.models.user import User
-from app.domain.interfaces.user_repository import UserRepository
-from app.application.dto.user import UserDTO, UserCreateDTO
+from services.auth.app.domain.models.user_model import User
+from services.auth.app.domain.interfaces.user_repository_impl import UserRepository
+from services.auth.app.application.dto.user_dto import UserDTO, UserCreateDTO
 from mailforge_shared.core.utils.password_utils import Hash
 
 

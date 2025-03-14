@@ -4,7 +4,8 @@ import json
 import logging
 from app.application.services.smtp_service import SMTPService
 from app.application.services.telegram_service import TelegramService
-from app.application.dto.telegram import TelegramDTO
+
+# from app.application.dto.telegram import TelegramDTO
 
 logger = logging.getLogger(__name__)
 

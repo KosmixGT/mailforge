@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from mailforge_shared.core.config.database import Base
 from app.domain.models.history import MailingHistory as DomainHistory
 
@@ -8,7 +8,7 @@ class MailingHistoryModel(Base):
     __tablename__ = "mailinghistory"
 
     historyid = Column(Integer, primary_key=True)
-    mailingid = Column(ForeignKey("mailings.mailingid"), nullable=False)
+    mailingid: Mapped[int] = mapped_column(ForeignKey("mailings.mailingid"), nullable=False)
     senttime = Column(DateTime, nullable=False)
     deliverystatusid = Column(Integer)  # Просто храним ID статуса
     # deliverystatusid = Column(ForeignKey("deliverystatuses.deliverystatusid"))

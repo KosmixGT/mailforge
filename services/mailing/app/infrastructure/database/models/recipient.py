@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from mailforge_shared.core.config.database import Base
 from app.domain.models.recipient import Recipient as DomainRecipient
 
@@ -8,24 +8,15 @@ class RecipientModel(Base):
     __tablename__ = "recipients"
 
     recipientid = Column(Integer, primary_key=True)
-    mailingid = Column(
+    mailingid: Mapped[int] = mapped_column(
         ForeignKey("mailings.mailingid", ondelete="CASCADE", onupdate="CASCADE"),
         nullable=False,
     )
-    addressid = Column(
+    addressid: Mapped[int] = mapped_column(
         ForeignKey("addresses.addressid", ondelete="RESTRICT", onupdate="CASCADE"),
         nullable=False,
     )
-    # deliverystatusid = Column(
-    #     ForeignKey(
-    #         "deliverystatuses.deliverystatusid", ondelete="SET NULL", onupdate="CASCADE"
-    #     )
-    # )
     deliverystatusid = Column(Integer)  # Просто храним ID без ForeignKey
-    # historyid = Column(
-    #     ForeignKey("mailinghistory.historyid", ondelete="RESTRICT", onupdate="CASCADE"),
-    #     nullable=False,
-    # )
     historyid = Column(Integer)
 
     address = relationship("AddressModel")

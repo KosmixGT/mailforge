@@ -1,18 +1,16 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from mailforge_shared.core.config.database import Base
-from app.domain.models.user import User as DomainUser
-from app.infrastructure.database.models.user_role import UserRoleModel
-
+from services.auth.app.domain.models.user_model import User as DomainUser
 
 class UserModel(Base):
     __tablename__ = "users"
 
-    userid = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False)
-    email = Column(String(255), nullable=False, unique=True)
-    password = Column(String(255), nullable=False)
-    roleid = Column(ForeignKey("userroles.roleid"), nullable=False)
+    userid: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    roleid: Mapped[int] = mapped_column(ForeignKey("userroles.roleid"), nullable=False)
 
     userrole = relationship("UserRoleModel")
 

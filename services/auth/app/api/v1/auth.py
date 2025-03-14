@@ -6,7 +6,7 @@ from jose import JWTError
 from mailforge_shared.core.config.settings import settings
 from mailforge_shared.core.config.database import get_db
 from app.application.services.user_service import UserService
-from app.infrastructure.repositories.user import PostgresUserRepository
+from services.auth.app.infrastructure.repositories.user_repository import PostgresUserRepository
 from mailforge_shared.core.utils.token_utils import TokenHelper
 
 router = APIRouter(prefix="/auth", tags=["authorization"])

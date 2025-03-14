@@ -3,6 +3,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mailforge_shared.core.infrastructure.rabbitmq import RabbitMQQueue
 
+# Include routers
+from app.api.v1.mailing import router as mailing_router
+from app.api.v1.recipient import router as recipient_router
+from app.api.v1.address import router as address_router
+
 # Initialize RabbitMQ
 message_queue = RabbitMQQueue("amqp://guest:guest@rabbitmq:5672/")
 
@@ -28,10 +33,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-from app.api.v1.mailing import router as mailing_router
-from app.api.v1.recipient import router as recipient_router
-from app.api.v1.address import router as address_router
 
 app.include_router(mailing_router, prefix="/api/v1")
 app.include_router(recipient_router, prefix="/api/v1")

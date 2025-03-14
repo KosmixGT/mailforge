@@ -27,7 +27,7 @@ class AuthService:
             )
             return response.json()
         except httpx.HTTPError as e:
-            raise HTTPException(status_code=401, detail="Invalid token")
+            raise HTTPException(status_code=401, detail=f"Invalid token, {str(e)}")
 
     async def __aenter__(self):
         return self

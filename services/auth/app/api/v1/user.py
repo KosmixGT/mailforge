@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from mailforge_shared.core.config.database import get_db
-from app.application.dto.user import UserDTO, UserCreateDTO
+from services.auth.app.application.dto.user_dto import UserDTO, UserCreateDTO
 from app.application.services.user_service import UserService
-from app.infrastructure.repositories.user import PostgresUserRepository
+from services.auth.app.infrastructure.repositories.user_repository import PostgresUserRepository
 from app.api.v1.auth import get_current_user
 
 router = APIRouter(prefix="/users", tags=["user"])

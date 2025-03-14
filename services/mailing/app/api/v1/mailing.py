@@ -82,7 +82,8 @@ async def upload_file(
     service: MailingService = Depends(get_mailing_service),
     file_service: FileProcessingService = Depends(),
 ):
-    if not file.filename.endswith((".csv", ".xls", ".xlsx")):
+    filename = file.filename or ""
+    if not filename.endswith((".csv", ".xls", ".xlsx")):
         raise HTTPException(
             status_code=400, detail="Допустимые форматы файлов: CSV, XLS, XLSX"
         )

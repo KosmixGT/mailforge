@@ -5,6 +5,10 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 
+# Include routers
+from app.api.v1.smtp import router as smtp_router
+from app.api.v1.telegram import router as telegram_router
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -40,10 +44,6 @@ app.add_middleware(
 async def root():
     return "Delivery Service!"
 
-
-# Include routers
-from app.api.v1.smtp import router as smtp_router
-from app.api.v1.telegram import router as telegram_router
 
 app.include_router(smtp_router, prefix="/api/v1")
 app.include_router(telegram_router, prefix="/api/v1")
