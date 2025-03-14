@@ -7,29 +7,49 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:
-  test:
+jobs:  
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      # Тестирование бэкенда
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.12.2'
-      
-      # Установка зависимостей для бэкенда
-      - name: Install backend dependencies
+      - name: Install lint dependencies
         run: |
-          cd server
+          pip install flake8 black mypy
+        # Запуск линтинга
+      - name: Run linting
+        run: |
+          black server/app services/*/app --check
+          flake8 server/app services/*/app
+          mypy server/app services/*/app
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+    # Указываем, какие сервисы будут тестироваться
+      matrix:
+        service: [server, auth, mailing, delivery, history]
+    steps:
+      - uses: actions/checkout@v2
+        # Установка Python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.2'
+        # Установка зависимостей
+      - name: Install dependencies
+        run: |
+          cd services/${{ matrix.service }}
           pip install -r requirements.txt
           pip install pytest pytest-cov
-
-      # Запуск тестов бэкенда с проверкой покрытия кода
-      - name: Run backend tests
+        # Тестирование бэкэнда
+      - name: Run tests
         run: |
-          cd server
+          cd services/${{ matrix.service }}
           pytest tests/ --cov=app
 
       # Тестирование фронтенда

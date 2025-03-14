@@ -18,4 +18,4 @@ app.add_middleware(
 
 @app.get('/', tags=["root"])
 async def root():
-    return "Hello World!"
+    return "Mailing System!"

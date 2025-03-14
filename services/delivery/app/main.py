@@ -34,6 +34,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get('/', tags=["root"])
+async def root():
+    return "Delivery Service!"
+
 # Include routers
 from app.api.v1.smtp import router as smtp_router
 from app.api.v1.telegram import router as telegram_router

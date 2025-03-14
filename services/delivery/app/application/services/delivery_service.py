@@ -16,7 +16,7 @@ class DeliveryService:
             await self.smtp_service.send_email(email_dto)
         elif mailing_type == 'telegram':
             telegram_data = TelegramDTO(
-                bot_token="yuor_token",  # Get from config
+                bot_token="your_token",  # Get from config
                 chat_ids=["@chat_id_example"],   # Get from config
                 subject=mailing_data['data']['title'],
                 body=mailing_data['data']['message']

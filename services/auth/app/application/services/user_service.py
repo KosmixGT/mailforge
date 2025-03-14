@@ -1,4 +1,6 @@
 from typing import Optional
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from app.domain.models.user import User
 from app.domain.interfaces.user_repository import UserRepository
 from app.application.dto.user import UserDTO, UserCreateDTO
@@ -18,16 +20,22 @@ class UserService:
         return UserDTO.from_domain(user) if user else None
 
     async def create_user(self, user_dto: UserCreateDTO) -> UserDTO:
-        hashed_password = Hash.get_hashed_password(user_dto.password)
-        user = User(
-            id=None,
-            name=user_dto.name,
-            email=user_dto.email,
-            password=hashed_password,
-            role_id=user_dto.role_id,
-        )
-        created_user = await self.repository.create(user)
-        return UserDTO.from_domain(created_user)
+        try:
+            hashed_password = Hash.get_hashed_password(user_dto.password)
+            user = User(
+                id=None,
+                name=user_dto.name,
+                email=user_dto.email,
+                password=hashed_password,
+                role_id=user_dto.role_id,
+            )
+            created_user = await self.repository.create(user)
+            return UserDTO.from_domain(created_user)
+        except IntegrityError:
+            raise HTTPException(
+                status_code=400,
+                detail="User with this email already exists"
+            )
 
     async def authenticate_user(
         self, username: str, password: str

@@ -24,7 +24,7 @@ async def get_mailing(
     if not mailing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Mailing with id {mailing_id} not found",
+            detail=f"Mailing with id {mailing_id} not found",
         )
     return MailingDTO.from_domain(mailing)
 

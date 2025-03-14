@@ -30,20 +30,20 @@ services:
       - "5000:8000"
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-  # auth:
-  #   build:
-  #     context: .
-  #     dockerfile: services/auth/Dockerfile
-  #   volumes:
-  #     - ./services/auth/app:/app/app
-  #     - ./services/shared:/shared
-  #     - ./.env:/app/.env
-  #   environment:
-  #     - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
-  #     - PYTHONPATH=/app
-  #   ports:
-  #     - "8001:8000"
-  #   command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  auth:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    volumes:
+      - ./services/auth/app:/app/app
+      - ./services/shared:/shared
+      - ./.env:/app/.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
+      - PYTHONPATH=/app
+    ports:
+      - "8001:8000"
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
   mailing:
     depends_on:
@@ -99,6 +99,6 @@ services:
   # frontend:
   #   build: ./client
   #   environment:
-  #     - VUE_APP_BACKEND_URL=http://gateway:5000
+  #     - VUE_APP_BACKEND_URL=http://server:5000
   #   ports:
   #     - 8080:80
