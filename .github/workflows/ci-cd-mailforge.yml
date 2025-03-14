@@ -43,14 +43,15 @@ jobs:
           if [ "${{ matrix.service }}" == "server" ]; then
             cd server
             pip install -r requirements.txt
-            pip install pytest pytest-cov
+            pip install pytest pytest-cov httpx
             pip install -e ../services/shared
           else
             cd services/${{ matrix.service }}
             pip install -r requirements.txt
-            pip install pytest pytest-cov
+            pip install pytest pytest-cov httpx
             pip install -e ../../services/shared
           fi
+
       - name: Run tests
         run: |
           if [ "${{ matrix.service }}" == "server" ]; then
