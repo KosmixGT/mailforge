@@ -34,7 +34,6 @@ jobs:
         service: [server, auth, mailing, delivery, history]
     env:
       DATABASE_URL: ${{ secrets.ASYNC_DATABASE_URL }}
-      PYTHONPATH: ${{ github.workspace }}/services
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -54,6 +53,10 @@ jobs:
             pip install pytest pytest-cov httpx
             pip install -e ../../services/shared
           fi
+      
+      - name: Set up Python environment
+        run: |
+          echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
       - name: Run tests
         run: |
