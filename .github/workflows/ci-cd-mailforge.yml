@@ -11,6 +11,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug environment variables
+        run: |
+          if ! env | grep -q "ASYNC_DATABASE_URL"; then
+            echo "❌ ERROR: ASYNC_DATABASE_URL is not set!"
+            exit 1
+          fi
+          echo "✅ ASYNC_DATABASE_URL is set."
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
