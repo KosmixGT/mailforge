@@ -2,8 +2,7 @@ from app.domain.models.mailing import Mailing
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from mailforge_shared.core.config.database import Base
-
-# from app.infrastructure.database.models.mailing_status import MailingStatusModel
+from app.infrastructure.database.models.mailing_status import MailingStatusModel
 
 
 class MailingModel(Base):
@@ -19,7 +18,7 @@ class MailingModel(Base):
         ForeignKey("mailingstatuses.statusid"), nullable=False
     )
 
-    mailingstatus = relationship("MailingStatusModel")
+    mailingstatus = relationship(MailingStatusModel)
     # user = relationship("UserModel")
 
     def to_domain(self) -> "Mailing":

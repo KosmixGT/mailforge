@@ -2,8 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from mailforge_shared.core.config.database import Base
 from app.domain.models.address import Address as DomainAddress
-
-# from app.infrastructure.database.models.mailing_type import MailingTypeModel
+from app.infrastructure.database.models.mailing_type import MailingTypeModel
 
 
 class AddressModel(Base):
@@ -16,7 +15,7 @@ class AddressModel(Base):
     )
     address = Column(String(255), nullable=False, unique=True)
 
-    mailingtype = relationship("MailingTypeModel")
+    mailingtype = relationship(MailingTypeModel)
 
     def to_domain(self) -> DomainAddress:
         return DomainAddress(
