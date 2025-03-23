@@ -1,6 +1,5 @@
 import json
 from redis import Redis
-from mailforge_shared.core.config.settings import settings
 
 redis_client = Redis(host="redis", port=6379, decode_responses=True)
 
