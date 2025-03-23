@@ -1,6 +1,16 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -31,6 +41,10 @@ services:
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
   auth:
+    image: kosmixgt/mailforge-auth:latest
+    depends_on:
+      redis:
+        condition: service_healthy
     build:
       context: .
       dockerfile: services/auth/Dockerfile
@@ -39,6 +53,7 @@ services:
       - ./services/shared:/shared
       - ./.env:/app/.env
     environment:
+      - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgresql+asyncpg://ukjytlfedcwkuoctmf1q:pf5TFMPUO9SSX0D5eoqMJfEu2BRoD2@batop7otdx5qsxwciuwv-postgresql.services.clever-cloud.com:50013/batop7otdx5qsxwciuwv
       - PYTHONPATH=/app
     ports:

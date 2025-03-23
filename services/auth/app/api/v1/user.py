@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from mailforge_shared.core.config.database import get_db
 from app.application.dto.user_dto import UserDTO, UserCreateDTO
 from app.application.services.user_service import UserService
+from app.infrastructure.cache.redis_client import RedisCache
 from app.infrastructure.repositories.user_repository import (
     PostgresUserRepository,
 )
@@ -30,7 +31,17 @@ async def get_current_user_info(current_user: UserDTO = Depends(get_current_user
 
 @router.get("/{user_id}", response_model=UserDTO)
 async def get_user(user_id: int, service: UserService = Depends(get_user_service)):
+    # Try to get user from cache first
+    cached_user = await RedisCache.get_user(user_id)
+    if cached_user:
+        return cached_user
+
+    # If not in cache, get from database
     user = await service.get_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # Cache the user data
+    await RedisCache.set_user(user_id, user.model_dump())
+    
     return user
